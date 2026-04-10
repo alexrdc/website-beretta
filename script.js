@@ -83,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // === PARTS HOVER → IMAGE MARKER SYNC ===
     const partItems = document.querySelectorAll('.parts-list li[data-part]');
     const partMarkers = document.querySelectorAll('.part-marker');
+    const componentsImage = document.querySelector('.image-overlay-wrapper');
 
     function activateMarker(partId) {
         partMarkers.forEach(m => {
@@ -94,15 +95,63 @@ document.addEventListener('DOMContentLoaded', () => {
         partMarkers.forEach(m => m.classList.remove('active'));
     }
 
+    function isMobile() {
+        return window.innerWidth <= 900;
+    }
+
+    let activePartId = null;
+
     partItems.forEach(item => {
+        // Desktop hover
         item.addEventListener('mouseenter', () => {
-            activateMarker(item.getAttribute('data-part'));
+            if (!isMobile()) {
+                activateMarker(item.getAttribute('data-part'));
+            }
         });
-        item.addEventListener('mouseleave', clearMarkers);
-        // Touch support for mobile
-        item.addEventListener('touchstart', () => {
-            activateMarker(item.getAttribute('data-part'));
-        }, { passive: true });
+        item.addEventListener('mouseleave', () => {
+            if (!isMobile()) {
+                clearMarkers();
+            }
+        });
+
+        // Mobile click → scroll to image + persistent highlight
+        item.addEventListener('click', (e) => {
+            if (isMobile()) {
+                e.preventDefault();
+                const partId = item.getAttribute('data-part');
+
+                // Toggle: if same part clicked, deactivate
+                if (activePartId === partId) {
+                    clearMarkers();
+                    activePartId = null;
+                    return;
+                }
+
+                activateMarker(partId);
+                activePartId = partId;
+
+                // Smooth scroll to image, centered in viewport
+                if (componentsImage) {
+                    // Small delay to ensure marker animation starts first
+                    setTimeout(() => {
+                        componentsImage.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    }, 50);
+                }
+            }
+        });
+    });
+
+    // Clear active state when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+        if (isMobile() && activePartId) {
+            if (!e.target.closest('.parts-list') && !e.target.closest('.image-overlay-wrapper')) {
+                clearMarkers();
+                activePartId = null;
+            }
+        }
     });
 
     // === SMOOTH SCROLL FOR ANCHOR LINKS (fallback for older browsers) ===

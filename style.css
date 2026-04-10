@@ -354,6 +354,8 @@ img {
 .hero-cta svg {
     width: 16px;
     height: 16px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
     animation: bounce 2s infinite;
 }
 
@@ -752,6 +754,8 @@ img {
     height: 28px;
     color: var(--accent);
     flex-shrink: 0;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .warning-box p {
@@ -1187,6 +1191,167 @@ img {
         padding: 0.8rem 1.5rem;
         font-size: 0.95rem;
     }
+
+    .videos-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sketchfab-embed-wrapper {
+        height: 400px;
+    }
+}
+
+/* === TIMELINE IMAGES === */
+.timeline-image {
+    display: block;
+    width: 100%;
+    max-width: 380px;
+    height: auto;
+    border-radius: 10px;
+    margin: 0 auto 1.25rem auto;
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.timeline-content {
+    text-align: center;
+}
+
+.timeline-content p {
+    text-align: left;
+}
+
+.timeline-image:hover {
+    transform: scale(1.02);
+    box-shadow: var(--shadow-lg);
+}
+
+.final-disassembly {
+    margin-top: 3rem;
+    text-align: center;
+    padding: 2rem;
+    background: var(--bg-card);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    border: 2px solid var(--border);
+}
+
+.final-disassembly .subsection-title {
+    margin-bottom: 1.5rem;
+}
+
+.final-image {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+/* === MULTIMEDIA SECTION === */
+.videos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.video-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    border: 2px solid var(--border);
+}
+
+.video-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent);
+}
+
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    overflow: hidden;
+}
+
+.video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.video-title {
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.02em;
+}
+
+.model-3d-container {
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin: 2rem 0;
+}
+
+.model-3d-tip {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding: 1rem 1.5rem;
+    background: var(--bg-alt);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+}
+
+.model-3d-tip svg {
+    width: 24px;
+    height: 24px;
+    stroke: var(--accent);
+    flex-shrink: 0;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.model-3d-tip p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.model-3d-tip strong {
+    color: var(--text-primary);
+}
+
+.sketchfab-embed-wrapper {
+    width: 100%;
+    height: 600px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.sketchfab-embed-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 12px;
 }
 
 /* === TEST CTA SECTION === */
