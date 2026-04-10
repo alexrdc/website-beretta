@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Beretta PX4 Storm</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 1rem 2rem 1rem;
+            margin-top: 60px;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .quiz-header h1 {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .quiz-info {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--bg-card);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .question-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .question-card.answered {
+            border-color: var(--accent);
+        }
+
+        .question-number {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .answer-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .answer-option {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .answer-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .answer-label {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bg-alt);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .answer-option input[type="radio"]:checked ~ .answer-label {
+            background: var(--accent-bright);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .answer-option:hover .answer-label {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+
+        .answer-radio {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            border: 2px solid var(--text-secondary);
+            border-radius: 50%;
+            margin-right: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .answer-option input[type="radio"]:checked ~ .answer-label .answer-radio {
+            background: white;
+            border-color: white;
+            box-shadow: inset 0 0 0 3px var(--accent);
+        }
+
+        .quiz-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-submit {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background: var(--accent-bright);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-reset {
+            background: var(--text-secondary);
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: var(--gunmetal);
+        }
+
+        .btn-home {
+            background: var(--bg-alt);
+            color: var(--text-primary);
+        }
+
+        .btn-home:hover {
+            background: var(--border);
+        }
+
+        .results-section {
+            display: none;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            margin-top: 2rem;
+        }
+
+        .results-section.show {
+            display: block;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .score-display {
+            margin: 2rem 0;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .score-max {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .score-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .score-percentage {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-alt);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .quiz-form.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <span class="logo-mark">PX4</span>
+                <span class="logo-text">Quiz</span>
+            </a>
+            <button class="nav-toggle" id="navToggle" aria-label="Meniu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Înapoi la manual</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- QUIZ CONTAINER -->
+    <main class="quiz-container">
+        <div class="quiz-header">
+            <h1>Quiz - Beretta PX4 Storm</h1>
+            <div class="quiz-info">
+                <div class="info-item">
+                    <div class="info-label">Întrebări</div>
+                    <div class="info-value">18</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Puncte din oficiu</div>
+                    <div class="info-value">1</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Nota maximă</div>
+                    <div class="info-value">10</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <form id="quizForm" class="quiz-form">
+            <!-- Întrebări vor fi generate de JavaScript -->
+        </form>
+
+        <div class="quiz-actions" id="quizActions">
+            <button type="button" class="btn btn-submit" id="submitBtn">Trimite răspunsuri</button>
+            <button type="button" class="btn btn-reset" id="resetBtn">Golire răspunsuri</button>
+            <a href="index.html" class="btn btn-home" style="text-decoration: none; text-align: center;">Înapoi la manual</a>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <h2>Rezultate Quiz</h2>
+            <div class="score-display">
+                <div class="score-circle">
+                    <div>
+                        <div class="score-value" id="finalScore">0</div>
+                        <div class="score-max">/10</div>
+                    </div>
+                </div>
+                <div class="score-text" id="scoreMessage"></div>
+                <div class="score-percentage" id="scorePercentage"></div>
+            </div>
+            <button type="button" class="btn btn-reset" id="retakeBtn">Încearcă din nou</button>
+        </div>
+    </main>
+
+    <script src="quiz.js"></script>
+</body>
+</html>
