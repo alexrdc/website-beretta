@@ -279,53 +279,7 @@
             display: none;
         }
 
-        .quiz-options {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 1.25rem;
-            flex-wrap: wrap;
-            margin: 1.5rem 0 1rem;
-            padding: 1rem;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-
-        .quiz-option-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .quiz-option-label input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--accent);
-            cursor: pointer;
-        }
-
-        .quiz-option-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            padding: 0.4rem 0.85rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .quiz-option-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .save-indicator {
+.save-indicator {
             position: fixed;
             top: 80px;
             right: 1rem;
@@ -394,21 +348,10 @@
                     <div class="info-label">Nota maximă</div>
                     <div class="info-value">10</div>
                 </div>
-                <div class="info-item" id="timerWrapper" style="display:none;">
+                <div class="info-item" id="timerWrapper">
                     <div class="info-label">Timp</div>
                     <div class="info-value" id="timerDisplay" aria-live="polite">00:00</div>
                 </div>
-            </div>
-            <div class="quiz-options">
-                <label class="quiz-option-label">
-                    <input type="checkbox" id="timerToggle">
-                    <span>Cronometru</span>
-                </label>
-                <label class="quiz-option-label">
-                    <input type="checkbox" id="shuffleToggle" checked>
-                    <span>Amestecă întrebările</span>
-                </label>
-                <button type="button" class="quiz-option-btn" id="clearProgressBtn" title="Șterge progresul salvat">Resetează progresul</button>
             </div>
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>

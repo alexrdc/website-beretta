@@ -178,11 +178,11 @@ let saveTimeout = null;
 document.addEventListener('DOMContentLoaded', () => {
     setupThemeToggle();
     setupNavToggle();
-    state = loadState() || createNewState({ shuffle: true, timer: false });
-    syncControlsToState();
+    state = createNewState({ shuffle: true, timer: true });
+    document.getElementById('timerWrapper').style.display = '';
     initializeQuiz();
     setupQuizEventListeners();
-    if (state.timerEnabled) startTimer();
+    startTimer();
 });
 
 // === STATE / STORAGE ===
@@ -247,14 +247,6 @@ function clearState() {
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
 }
 
-function syncControlsToState() {
-    const shuffleToggle = document.getElementById('shuffleToggle');
-    const timerToggle = document.getElementById('timerToggle');
-    const timerWrapper = document.getElementById('timerWrapper');
-    if (shuffleToggle) shuffleToggle.checked = state.shuffleEnabled;
-    if (timerToggle) timerToggle.checked = state.timerEnabled;
-    if (timerWrapper) timerWrapper.style.display = state.timerEnabled ? '' : 'none';
-}
 
 function showSaveIndicator() {
     const el = document.getElementById('saveIndicator');
@@ -345,41 +337,6 @@ function setupQuizEventListeners() {
     document.getElementById('submitBtn').addEventListener('click', submitQuiz);
     document.getElementById('resetBtn').addEventListener('click', resetAnswers);
     document.getElementById('retakeBtn').addEventListener('click', retakeQuiz);
-    document.getElementById('clearProgressBtn').addEventListener('click', clearAllProgress);
-
-    const shuffleToggle = document.getElementById('shuffleToggle');
-    if (shuffleToggle) {
-        shuffleToggle.addEventListener('change', () => {
-            // Toggling shuffle resets the quiz so the new order applies
-            const wantsShuffle = shuffleToggle.checked;
-            state = createNewState({ shuffle: wantsShuffle, timer: state.timerEnabled });
-            stopTimer();
-            if (state.timerEnabled) startTimer();
-            initializeQuiz();
-            showResultsHidden();
-            saveState();
-        });
-    }
-
-    const timerToggle = document.getElementById('timerToggle');
-    if (timerToggle) {
-        timerToggle.addEventListener('change', () => {
-            state.timerEnabled = timerToggle.checked;
-            const wrapper = document.getElementById('timerWrapper');
-            if (state.timerEnabled) {
-                state.timerStart = Date.now() - (state.timerElapsed || 0);
-                if (wrapper) wrapper.style.display = '';
-                startTimer();
-            } else {
-                stopTimer();
-                state.timerStart = null;
-                state.timerElapsed = 0;
-                if (wrapper) wrapper.style.display = 'none';
-                updateTimerDisplay(0);
-            }
-            saveState();
-        });
-    }
 }
 
 function setupThemeToggle() {
@@ -602,22 +559,11 @@ function resetAnswers() {
 }
 
 function retakeQuiz() {
-    // New attempt with the same shuffle/timer settings
-    state = createNewState({ shuffle: state.shuffleEnabled, timer: state.timerEnabled });
+    state = createNewState({ shuffle: true, timer: true });
     showResultsHidden();
     initializeQuiz();
-    if (state.timerEnabled) startTimer();
+    startTimer();
     saveState();
-}
-
-function clearAllProgress() {
-    stopTimer();
-    clearState();
-    state = createNewState({ shuffle: state.shuffleEnabled, timer: state.timerEnabled });
-    syncControlsToState();
-    showResultsHidden();
-    initializeQuiz();
-    if (state.timerEnabled) startTimer();
 }
 
 function showResultsHidden() {
