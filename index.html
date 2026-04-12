@@ -8,21 +8,23 @@
     <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
     <meta name="yandex" content="noindex, nofollow">
     <title>Pistolul Beretta PX4 Storm</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" as="image" href="images/beretta-px4-side.jpg" fetchpriority="high">
+    <link rel="preload" as="font" type="font/woff2" href="fonts/inter-latin.woff2" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="fonts/inter-latin-ext.woff2" crossorigin>
+    <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 
+    <a href="#main-content" class="skip-link">Sari la conținut</a>
+
     <!-- NAVIGATION -->
-    <nav class="navbar" id="navbar">
+    <nav class="navbar" id="navbar" aria-label="Navigare principală">
         <div class="nav-container">
             <a href="#hero" class="nav-logo">
                 <span class="logo-mark">PX4</span>
                 <span class="logo-text">Beretta Storm</span>
             </a>
-            <button class="nav-toggle" id="navToggle" aria-label="Meniu">
+            <button class="nav-toggle" id="navToggle" aria-label="Deschide meniul" aria-expanded="false" aria-controls="navMenu">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -35,9 +37,17 @@
                 <li><a href="#demontare">Demontare</a></li>
                 <li><a href="#intretinere">Întreținere</a></li>
                 <li><a href="quiz.html">Quiz</a></li>
+                <li>
+                    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Schimbă tema (luminos/întunecat)" title="Schimbă tema">
+                        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    </button>
+                </li>
             </ul>
         </div>
     </nav>
+
+    <main id="main-content">
 
     <!-- HERO -->
     <section id="hero" class="hero">
@@ -62,11 +72,11 @@
                     </div>
                 </div>
                 <a href="#descriere" class="hero-cta">Descoperă pistolul
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
                 </a>
             </div>
             <div class="hero-image">
-                <img src="images/beretta-px4-side.jpg" alt="Pistolul Beretta PX4 Storm">
+                <img src="images/beretta-px4-side.jpg" alt="Pistolul Beretta PX4 Storm" width="1600" height="1224" fetchpriority="high" decoding="async">
             </div>
         </div>
     </section>
@@ -95,7 +105,7 @@
                     <p>Poziția intermediară a cocoșului garantează oprirea pe maneta de tragere, înainte de a lovi percutorul, în cazul în care este eliberat accidental din poziția de tragere în urma unei lovituri violente sau dacă pistolul cade.</p>
                 </div>
                 <div class="description-image reveal">
-                    <img src="images/beretta-px4-storm.jpg" alt="Beretta PX4 Storm vedere laterală">
+                    <img src="images/beretta-px4-storm.jpg" alt="Beretta PX4 Storm vedere laterală" width="761" height="600" loading="lazy" decoding="async">
                 </div>
             </div>
 
@@ -169,7 +179,7 @@
                 </div>
                 <div class="components-image reveal">
                     <div class="image-overlay-wrapper">
-                        <img src="images/beretta-px4-field-stripped2.jpg" alt="Beretta PX4 Storm cu părțile componente">
+                        <img src="images/beretta-px4-field-stripped2.jpg" alt="Beretta PX4 Storm cu părțile componente" width="1600" height="1652" loading="lazy" decoding="async">
                         <span class="part-marker" data-part="a" style="top: 0%; left: 2%; width: 85%; height: 17%;"></span>
                         <span class="part-marker" data-part="b" style="top: 3%; left: 64%; width: 10%; height: 10%;"></span>
                         <span class="part-marker" data-part="c" style="top: 17%; left: 7%; width: 58%; height: 10%;"></span>
@@ -207,7 +217,7 @@
 
             <div class="function-grid">
                 <div class="function-image reveal">
-                    <img src="images/beretta-px4-rotating-barrel.jpg" alt="Sistemul cu țeavă cu translatare rotativă Beretta PX4 Storm">
+                    <img src="images/beretta-px4-rotating-barrel.jpg" alt="Sistemul cu țeavă cu translatare rotativă Beretta PX4 Storm" width="944" height="758" loading="lazy" decoding="async">
                 </div>
                 <div class="function-text reveal">
                     <p class="lead-text">Pistolul Beretta PX4 Storm este o armă semi-automată care se caracterizează printr-o închidere geometrică cu țeavă cu translatare rotativă.</p>
@@ -227,8 +237,8 @@
                 <h2 class="section-title">Demontarea și montarea pistolului Beretta PX4 Storm</h2>
             </div>
 
-            <div class="warning-box reveal">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div class="warning-box reveal" role="note" aria-label="Atenție">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                 <p><b>Atenție!:</b> Se recomandă să se efectueze operațiunile de demontare și reasamblare lucrând deasupra unei suprafețe de sprijin în cazul căderii pieselor.</p>
             </div>
 
@@ -238,56 +248,56 @@
                 <div class="timeline-item reveal">
                     <div class="timeline-marker">1</div>
                     <div class="timeline-content">
-                        <img src="images/demontare-1.png" alt="Pasul 1 - Extragerea încărcătorului" class="timeline-image">
+                        <img src="images/demontare-1.jpg" alt="Pasul 1 - Extragerea încărcătorului" class="timeline-image" width="1000" height="729" loading="lazy" decoding="async">
                         <p>Se apasă butonul de eliberare a încărcătorului și se extrage încărcătorul;</p>
                     </div>
                 </div>
                 <div class="timeline-item reveal">
                     <div class="timeline-marker">2</div>
                     <div class="timeline-content">
-                        <img src="images/demontare-3.png" alt="Pasul 2 - Verificarea camerei cartușului" class="timeline-image">
+                        <img src="images/demontare-3.jpg" alt="Pasul 2 - Verificarea camerei cartușului" class="timeline-image" width="1000" height="589" loading="lazy" decoding="async">
                         <p>Se trage de manșonul închizător în direcția părții din spate a pistolului, simultan cu ridicarea pârghiei de blocare a manșonului (slide stop) blocându-se acesta iar apoi se verifică vizual și tactic camera cartușului și mânerul pistol după care se deblochează manșonul închizător;</p>
                     </div>
                 </div>
                 <div class="timeline-item reveal">
                     <div class="timeline-marker">3</div>
                     <div class="timeline-content">
-                        <img src="images/demontare-5.png" alt="Pasul 3 - Apăsarea șurubului de montaj" class="timeline-image">
+                        <img src="images/demontare-5.jpg" alt="Pasul 3 - Apăsarea șurubului de montaj" class="timeline-image" width="1000" height="700" loading="lazy" decoding="async">
                         <p>Cu degetul mare și arătătorul mâinii care nu ține arma se apasă simultan cele două capete ale șurubului de montaj în jos;</p>
                     </div>
                 </div>
                 <div class="timeline-item reveal">
                     <div class="timeline-marker">4</div>
                     <div class="timeline-content">
-                        <img src="images/demontare-6.png" alt="Pasul 4 - Împingerea manșonului închizător înainte" class="timeline-image">
+                        <img src="images/demontare-6.jpg" alt="Pasul 4 - Împingerea manșonului închizător înainte" class="timeline-image" width="1000" height="685" loading="lazy" decoding="async">
                         <p>Se împinge ușor înainte manșonul închizător cu degetul mare de la mâna care ține arma, apăsând pe partea din spate a manșonului închizător;</p>
                     </div>
                 </div>
                 <div class="timeline-item reveal">
                     <div class="timeline-marker">5</div>
                     <div class="timeline-content">
-                        <img src="images/demontare-7.png" alt="Pasul 5 - Tragerea grupului închizător" class="timeline-image">
+                        <img src="images/demontare-7.jpg" alt="Pasul 5 - Tragerea grupului închizător" class="timeline-image" width="504" height="750" loading="lazy" decoding="async">
                         <p>Se trage înainte grupul închizător, țeavă-bloc central, arcul de recuperare cu ghidajul respectiv;</p>
                     </div>
                 </div>
                 <div class="timeline-item reveal">
                     <div class="timeline-marker">6</div>
                     <div class="timeline-content">
-                        <img src="images/demontare-8.png" alt="Pasul 6 - Scoaterea blocului central" class="timeline-image">
+                        <img src="images/demontare-8.jpg" alt="Pasul 6 - Scoaterea blocului central" class="timeline-image" width="620" height="639" loading="lazy" decoding="async">
                         <p>Ținând manșonul închizător cu dispozitivele de ochire orientate în jos, se scoate blocul central, arcul de recuperare și ghidajul țevii;</p>
                     </div>
                 </div>
                 <div class="timeline-item reveal">
                     <div class="timeline-marker">7</div>
                     <div class="timeline-content">
-                        <img src="images/demontare-10.png" alt="Pasul 7 - Scoaterea ansamblului arc de recuperare" class="timeline-image">
+                        <img src="images/demontare-10.jpg" alt="Pasul 7 - Scoaterea ansamblului arc de recuperare" class="timeline-image" width="607" height="750" loading="lazy" decoding="async">
                         <p>Se scoate ansamblul arc de recuperare-ghidaj arc din blocul central</p>
                     </div>
                 </div>
                 <div class="timeline-item reveal">
                     <div class="timeline-marker">8</div>
                     <div class="timeline-content">
-                        <img src="images/demontare-9.png" alt="Pasul 8 - Scoaterea țevii" class="timeline-image">
+                        <img src="images/demontare-9.jpg" alt="Pasul 8 - Scoaterea țevii" class="timeline-image" width="620" height="691" loading="lazy" decoding="async">
                         <p>Ținând manșonul închizătorului cu dispozitivele de ochire orientate în sus și ușor înclinate (cătarea cea mai înaltă), scoateți țeava dinspre partea inferioară, ajutând trecerea prin rotație (în sens contrar acelor de ceasornic cu gura țevii orientată către înainte).</p>
                     </div>
                 </div>
@@ -336,8 +346,8 @@
                 <p>Se vor șterge componentele cu o cârpă uscată până aceasta va rămâne curată. După curățare componentele metalice ale pistolului vor fi unse ușor cu ulei de armă.</p>
             </div>
 
-            <div class="warning-box warning-danger reveal">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div class="warning-box warning-danger reveal" role="note" aria-label="Avertisment">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                 <p><strong>AVERTISMENT:</strong> Nu se aplică niciodată prea mult ulei. Acumularea de ulei atrage murdăria care poate împiedica funcționarea și reduce fiabilitatea armei.</p>
             </div>
         </div>
@@ -353,12 +363,12 @@
             <div class="model-3d-section reveal">
                 <div class="model-3d-container">
                     <div class="sketchfab-embed-wrapper">
-                        <iframe title="Beretta Px4 Storm" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/4a12d3cc033d47c6a6cc881a6b186f17/embed"></iframe>
+                        <iframe title="Beretta Px4 Storm" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share loading="lazy" src="https://sketchfab.com/models/4a12d3cc033d47c6a6cc881a6b186f17/embed"></iframe>
                     </div>
                 </div>
 
-                <div class="model-3d-tip">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <div class="model-3d-tip" role="note">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                     <p><strong>Sfat:</strong> Dacă nu poți derula pagina, apasă o dată în afara modelului 3D și apoi poți derula normal.</p>
                 </div>
             </div>
@@ -376,19 +386,19 @@
                 <div class="videos-grid" id="videosContainer">
                     <div class="video-card">
                         <div class="video-wrapper">
-                            <iframe src="https://www.youtube.com/embed/aCo9n8Tk0gk" title="Tutorial demontare pistol Beretta PX4 Storm" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                            <iframe src="https://www.youtube.com/embed/aCo9n8Tk0gk" title="Tutorial demontare pistol Beretta PX4 Storm" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
                         </div>
                         <h4 class="video-title">Tutorial demontarea și montarea pistolului Beretta PX4 Storm</h4>
                     </div>
                     <div class="video-card">
                         <div class="video-wrapper">
-                            <iframe src="https://www.youtube.com/embed/4Hb3KuLOnIU" title="Demonstrație încărcare armă și tragere" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                            <iframe src="https://www.youtube.com/embed/4Hb3KuLOnIU" title="Demonstrație încărcare armă și tragere" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
                         </div>
                         <h4 class="video-title">Demonstrație încărcare, dezasigurare și tragere</h4>
                     </div>
                     <div class="video-card">
                         <div class="video-wrapper">
-                            <iframe src="https://www.youtube.com/embed/2wQciLGDldc?start=152" title="Video complet Beretta PX4 Storm în română" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                            <iframe src="https://www.youtube.com/embed/2wQciLGDldc?start=152" title="Video complet Beretta PX4 Storm în română" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
                         </div>
                         <h4 class="video-title">Prezentare completă Beretta PX4 Storm (RO)</h4>
                     </div>
@@ -403,10 +413,12 @@
             <div class="cta-content reveal">
                 <h2>Ai învățat suficient?</h2>
                 <p>Testează-ți cunoștințele despre pistolul Beretta PX4 Storm cu un test rapid.</p>
-                <a href="quiz.html" class="cta-button">Incepe testul →</a>
+                <a href="quiz.html" class="cta-button">Începe testul →</a>
             </div>
         </div>
     </section>
+
+    </main>
 
     <!-- FOOTER -->
     <footer class="footer">
@@ -415,22 +427,20 @@
                 <div class="footer-section">
                     <h4>BIBLIOGRAFIE</h4>
                     <ul>
+                        <li>Bazele pregătirii polițiștilor | Vol. 1 — Capitolul 2: Cunoașterea pistolului Beretta PX4 Storm;</li>
                         <li>Instrucțiuni pentru cunoașterea, întrebuințarea și întreținerea pistolului calibru 7,65 model 1974;</li>
                         <li>Manual de instrucțiuni Beretta PX4 Storm;</li>
+                        <li>Tutorial demontare și reasamblare — <a href="https://www.politisti.ro/forums/topic/20167-demontarea-si-reasamblarea-pistolului-beretta-px4-storm/" target="_blank" rel="noopener noreferrer">politisti.ro</a>;</li>
+                        <li>Model 3D interactiv Beretta PX4 Storm — <a href="https://sketchfab.com/3d-models/beretta-px4-storm-4a12d3cc033d47c6a6cc881a6b186f17" target="_blank" rel="noopener noreferrer">Sketchfab</a>.</li>
                     </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>SURSA</h4>
-                    <p>Bazele pregătirii polițiștilor | Vol. 1<br>
-                    Capitolul 2 — Cunoașterea pistolului Beretta PX4 Storm</p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 — Material didactic Beretta PX4 Storm</p><p class="footer-note">Uz intern</p>
+                <p>&copy; 2026 — Material didactic Beretta PX4 Storm</p>
             </div>
         </div>
     </footer>
 
-    <script src="script.js?v=2"></script>
+    <script src="script.js?v=3" defer></script>
 </body>
 </html>

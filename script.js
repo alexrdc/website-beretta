@@ -5,14 +5,43 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // === THEME TOGGLE ===
+    const themeToggle = document.getElementById('themeToggle');
+    const root = document.documentElement;
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme === 'dark' || storedTheme === 'light') {
+        root.setAttribute('data-theme', storedTheme);
+    }
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const current = root.getAttribute('data-theme');
+            let next;
+            if (current === 'dark') {
+                next = 'light';
+            } else if (current === 'light') {
+                next = 'dark';
+            } else {
+                // No manual theme set yet — flip from current system preference
+                const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                next = systemDark ? 'light' : 'dark';
+            }
+            root.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            themeToggle.setAttribute('aria-label',
+                next === 'dark' ? 'Schimbă la tema luminoasă' : 'Schimbă la tema întunecată');
+        });
+    }
+
     // === MOBILE NAV TOGGLE ===
     const navToggle = document.getElementById('navToggle');
     const navMenu = document.getElementById('navMenu');
 
     if (navToggle) {
         navToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
+            const isOpen = navMenu.classList.toggle('active');
             navToggle.classList.toggle('active');
+            navToggle.setAttribute('aria-expanded', String(isOpen));
+            navToggle.setAttribute('aria-label', isOpen ? 'Închide meniul' : 'Deschide meniul');
         });
     }
 
@@ -21,6 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', () => {
             navMenu.classList.remove('active');
             navToggle.classList.remove('active');
+            navToggle.setAttribute('aria-expanded', 'false');
+            navToggle.setAttribute('aria-label', 'Deschide meniul');
         });
     });
 

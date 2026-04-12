@@ -8,10 +8,9 @@
     <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
     <meta name="yandex" content="noindex, nofollow">
     <title>Quiz - Beretta PX4 Storm</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" as="font" type="font/woff2" href="fonts/inter-latin.woff2" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="fonts/inter-latin-ext.woff2" crossorigin>
+    <link rel="stylesheet" href="style.css?v=2">
     <style>
         .quiz-container {
             max-width: 800px;
@@ -279,30 +278,107 @@
         .quiz-form.hidden {
             display: none;
         }
+
+        .quiz-options {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0 1rem;
+            padding: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .quiz-option-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .quiz-option-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .quiz-option-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.4rem 0.85rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quiz-option-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .save-indicator {
+            position: fixed;
+            top: 80px;
+            right: 1rem;
+            background: var(--accent);
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .save-indicator.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
 
+    <a href="#main-content" class="skip-link">Sari la conținut</a>
+
     <!-- NAVIGATION -->
-    <nav class="navbar" id="navbar">
+    <nav class="navbar" id="navbar" aria-label="Navigare principală">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">
                 <span class="logo-mark">PX4</span>
                 <span class="logo-text">Quiz</span>
             </a>
-            <button class="nav-toggle" id="navToggle" aria-label="Meniu">
+            <button class="nav-toggle" id="navToggle" aria-label="Deschide meniul" aria-expanded="false" aria-controls="navMenu">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
             <ul class="nav-menu" id="navMenu">
                 <li><a href="index.html">Înapoi la manual</a></li>
+                <li>
+                    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Schimbă tema (luminos/întunecat)" title="Schimbă tema">
+                        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    </button>
+                </li>
             </ul>
         </div>
     </nav>
 
+    <div class="save-indicator" id="saveIndicator" role="status" aria-live="polite">Progres salvat</div>
+
     <!-- QUIZ CONTAINER -->
-    <main class="quiz-container">
+    <main class="quiz-container" id="main-content">
         <div class="quiz-header">
             <h1>Quiz - Beretta PX4 Storm</h1>
             <div class="quiz-info">
@@ -318,6 +394,21 @@
                     <div class="info-label">Nota maximă</div>
                     <div class="info-value">10</div>
                 </div>
+                <div class="info-item" id="timerWrapper" style="display:none;">
+                    <div class="info-label">Timp</div>
+                    <div class="info-value" id="timerDisplay" aria-live="polite">00:00</div>
+                </div>
+            </div>
+            <div class="quiz-options">
+                <label class="quiz-option-label">
+                    <input type="checkbox" id="timerToggle">
+                    <span>Cronometru</span>
+                </label>
+                <label class="quiz-option-label">
+                    <input type="checkbox" id="shuffleToggle" checked>
+                    <span>Amestecă întrebările</span>
+                </label>
+                <button type="button" class="quiz-option-btn" id="clearProgressBtn" title="Șterge progresul salvat">Resetează progresul</button>
             </div>
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
@@ -350,6 +441,6 @@
         </div>
     </main>
 
-    <script src="quiz.js"></script>
+    <script src="quiz.js?v=2" defer></script>
 </body>
 </html>

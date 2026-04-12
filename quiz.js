@@ -1,6 +1,7 @@
 /* ============================================
    BERETTA PX4 STORM — Quiz JavaScript
    18 questions, 1 point from office, max grade 10
+   Features: shuffle, timer, localStorage progress save
    ============================================ */
 
 const quizData = [
@@ -168,127 +169,337 @@ const quizData = [
     }
 ];
 
+const STORAGE_KEY = 'beretta-quiz-state';
+
+let state = null;        // current quiz state object
+let timerInterval = null;
+let saveTimeout = null;
+
 document.addEventListener('DOMContentLoaded', () => {
+    setupThemeToggle();
+    setupNavToggle();
+    state = loadState() || createNewState({ shuffle: true, timer: false });
+    syncControlsToState();
     initializeQuiz();
-    setupEventListeners();
+    setupQuizEventListeners();
+    if (state.timerEnabled) startTimer();
 });
+
+// === STATE / STORAGE ===
+
+function createNewState({ shuffle, timer }) {
+    const ids = quizData.map(q => q.id);
+    const questionOrder = shuffle ? shuffleArray(ids) : ids.slice();
+
+    // For each question, build a permutation of answer indices
+    const answerOrder = {};
+    quizData.forEach(q => {
+        const idx = q.answers.map((_, i) => i);
+        answerOrder[q.id] = shuffle ? shuffleArray(idx) : idx;
+    });
+
+    return {
+        questionOrder,
+        answerOrder,
+        userAnswers: {},  // questionId -> chosen index in shuffled answer order
+        shuffleEnabled: shuffle,
+        timerEnabled: timer,
+        timerElapsed: 0,
+        timerStart: timer ? Date.now() : null,
+        completed: false,
+        finalResults: null
+    };
+}
+
+function loadState() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        // Sanity check that parsed has the expected shape
+        if (!parsed.questionOrder || !parsed.answerOrder) return null;
+        return parsed;
+    } catch (e) {
+        return null;
+    }
+}
+
+function saveState() {
+    if (!state) return;
+    // If timer is running, store the live elapsed value before persisting
+    if (state.timerEnabled && state.timerStart && !state.completed) {
+        state.timerElapsed = Date.now() - state.timerStart;
+    }
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        showSaveIndicator();
+    } catch (e) {
+        // localStorage may be unavailable (private mode)
+    }
+}
+
+function debouncedSave() {
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(saveState, 250);
+}
+
+function clearState() {
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+}
+
+function syncControlsToState() {
+    const shuffleToggle = document.getElementById('shuffleToggle');
+    const timerToggle = document.getElementById('timerToggle');
+    const timerWrapper = document.getElementById('timerWrapper');
+    if (shuffleToggle) shuffleToggle.checked = state.shuffleEnabled;
+    if (timerToggle) timerToggle.checked = state.timerEnabled;
+    if (timerWrapper) timerWrapper.style.display = state.timerEnabled ? '' : 'none';
+}
+
+function showSaveIndicator() {
+    const el = document.getElementById('saveIndicator');
+    if (!el) return;
+    el.classList.add('visible');
+    clearTimeout(showSaveIndicator._t);
+    showSaveIndicator._t = setTimeout(() => el.classList.remove('visible'), 1200);
+}
+
+// === RENDERING ===
 
 function initializeQuiz() {
     const form = document.getElementById('quizForm');
     form.innerHTML = '';
 
-    quizData.forEach((question, index) => {
+    state.questionOrder.forEach((qid, displayIndex) => {
+        const question = quizData.find(q => q.id === qid);
+        if (!question) return;
+
         const questionDiv = document.createElement('div');
         questionDiv.className = 'question-card';
         questionDiv.id = `question-${question.id}`;
 
         const questionHeader = document.createElement('div');
         questionHeader.innerHTML = `
-            <div class="question-number">Întrebarea ${index + 1} din 18</div>
-            <div class="question-text">${question.question}</div>
+            <div class="question-number">Întrebarea ${displayIndex + 1} din ${state.questionOrder.length}</div>
+            <div class="question-text"></div>
         `;
+        questionHeader.querySelector('.question-text').textContent = question.question;
         questionDiv.appendChild(questionHeader);
 
         const answersDiv = document.createElement('div');
         answersDiv.className = 'answer-options';
 
-        question.answers.forEach((answer, answerIndex) => {
+        const answerPermutation = state.answerOrder[question.id];
+        answerPermutation.forEach((origIndex, displayAnswerIndex) => {
+            const answer = question.answers[origIndex];
             const optionDiv = document.createElement('div');
             optionDiv.className = 'answer-option';
 
-            const inputId = `q${question.id}_a${answerIndex}`;
+            const inputId = `q${question.id}_a${displayAnswerIndex}`;
 
             const input = document.createElement('input');
             input.type = 'radio';
             input.name = `question-${question.id}`;
             input.id = inputId;
-            input.value = answerIndex;
+            input.value = displayAnswerIndex;
+            if (state.userAnswers[question.id] === displayAnswerIndex) {
+                input.checked = true;
+            }
 
             const label = document.createElement('label');
             label.htmlFor = inputId;
             label.className = 'answer-label';
-            label.innerHTML = `
-                <span class="answer-radio"></span>
-                <span>${answer.text}</span>
-            `;
+            const radioSpan = document.createElement('span');
+            radioSpan.className = 'answer-radio';
+            const textSpan = document.createElement('span');
+            textSpan.textContent = answer.text;
+            label.appendChild(radioSpan);
+            label.appendChild(textSpan);
 
             optionDiv.appendChild(input);
             optionDiv.appendChild(label);
             answersDiv.appendChild(optionDiv);
 
-            // Mark question as answered when selection changes
             input.addEventListener('change', () => {
+                state.userAnswers[question.id] = displayAnswerIndex;
                 document.getElementById(`question-${question.id}`).classList.add('answered');
                 updateProgress();
+                debouncedSave();
             });
         });
+
+        if (state.userAnswers[question.id] !== undefined) {
+            questionDiv.classList.add('answered');
+        }
 
         questionDiv.appendChild(answersDiv);
         form.appendChild(questionDiv);
     });
+
+    updateProgress();
 }
 
-function setupEventListeners() {
+// === EVENT LISTENERS ===
+
+function setupQuizEventListeners() {
     document.getElementById('submitBtn').addEventListener('click', submitQuiz);
-    document.getElementById('resetBtn').addEventListener('click', resetQuiz);
+    document.getElementById('resetBtn').addEventListener('click', resetAnswers);
     document.getElementById('retakeBtn').addEventListener('click', retakeQuiz);
+    document.getElementById('clearProgressBtn').addEventListener('click', clearAllProgress);
 
-    // Mobile nav toggle
-    const navToggle = document.getElementById('navToggle');
-    const navMenu = document.getElementById('navMenu');
-
-    if (navToggle) {
-        navToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-            navToggle.classList.toggle('active');
+    const shuffleToggle = document.getElementById('shuffleToggle');
+    if (shuffleToggle) {
+        shuffleToggle.addEventListener('change', () => {
+            // Toggling shuffle resets the quiz so the new order applies
+            const wantsShuffle = shuffleToggle.checked;
+            state = createNewState({ shuffle: wantsShuffle, timer: state.timerEnabled });
+            stopTimer();
+            if (state.timerEnabled) startTimer();
+            initializeQuiz();
+            showResultsHidden();
+            saveState();
         });
     }
 
-    // Close mobile menu when clicking a link
+    const timerToggle = document.getElementById('timerToggle');
+    if (timerToggle) {
+        timerToggle.addEventListener('change', () => {
+            state.timerEnabled = timerToggle.checked;
+            const wrapper = document.getElementById('timerWrapper');
+            if (state.timerEnabled) {
+                state.timerStart = Date.now() - (state.timerElapsed || 0);
+                if (wrapper) wrapper.style.display = '';
+                startTimer();
+            } else {
+                stopTimer();
+                state.timerStart = null;
+                state.timerElapsed = 0;
+                if (wrapper) wrapper.style.display = 'none';
+                updateTimerDisplay(0);
+            }
+            saveState();
+        });
+    }
+}
+
+function setupThemeToggle() {
+    const themeToggle = document.getElementById('themeToggle');
+    const root = document.documentElement;
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme === 'dark' || storedTheme === 'light') {
+        root.setAttribute('data-theme', storedTheme);
+    }
+    if (!themeToggle) return;
+    themeToggle.addEventListener('click', () => {
+        const current = root.getAttribute('data-theme');
+        let next;
+        if (current === 'dark') next = 'light';
+        else if (current === 'light') next = 'dark';
+        else next = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        themeToggle.setAttribute('aria-label',
+            next === 'dark' ? 'Schimbă la tema luminoasă' : 'Schimbă la tema întunecată');
+    });
+}
+
+function setupNavToggle() {
+    const navToggle = document.getElementById('navToggle');
+    const navMenu = document.getElementById('navMenu');
+    if (!navToggle || !navMenu) return;
+    navToggle.addEventListener('click', () => {
+        const isOpen = navMenu.classList.toggle('active');
+        navToggle.classList.toggle('active');
+        navToggle.setAttribute('aria-expanded', String(isOpen));
+        navToggle.setAttribute('aria-label', isOpen ? 'Închide meniul' : 'Deschide meniul');
+    });
     document.querySelectorAll('.nav-menu a').forEach(link => {
         link.addEventListener('click', () => {
             navMenu.classList.remove('active');
             navToggle.classList.remove('active');
+            navToggle.setAttribute('aria-expanded', 'false');
+            navToggle.setAttribute('aria-label', 'Deschide meniul');
         });
     });
 }
 
-function updateProgress() {
-    const form = document.getElementById('quizForm');
-    const totalQuestions = quizData.length;
-    const answeredQuestions = form.querySelectorAll('input[type="radio"]:checked').length;
-    const percentage = (answeredQuestions / totalQuestions) * 100;
+// === TIMER ===
 
+function startTimer() {
+    stopTimer();
+    if (!state.timerStart) state.timerStart = Date.now() - (state.timerElapsed || 0);
+    updateTimerDisplay(Date.now() - state.timerStart);
+    timerInterval = setInterval(() => {
+        const elapsed = Date.now() - state.timerStart;
+        updateTimerDisplay(elapsed);
+    }, 1000);
+}
+
+function stopTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+function updateTimerDisplay(ms) {
+    const display = document.getElementById('timerDisplay');
+    if (!display) return;
+    const totalSec = Math.floor(ms / 1000);
+    const min = Math.floor(totalSec / 60);
+    const sec = totalSec % 60;
+    display.textContent = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+}
+
+// === PROGRESS ===
+
+function updateProgress() {
+    const totalQuestions = quizData.length;
+    const answeredCount = Object.keys(state.userAnswers).length;
+    const percentage = (answeredCount / totalQuestions) * 100;
     document.getElementById('progressFill').style.width = percentage + '%';
 }
 
+// === SUBMIT ===
+
 function submitQuiz() {
-    const form = document.getElementById('quizForm');
     let correctAnswers = 0;
     const wrongAnswers = [];
 
-    quizData.forEach((question) => {
-        const selectedAnswer = form.querySelector(`input[name="question-${question.id}"]:checked`);
-        const selectedIndex = selectedAnswer ? parseInt(selectedAnswer.value) : -1;
-        const isCorrect = selectedIndex !== -1 && question.answers[selectedIndex].correct;
+    state.questionOrder.forEach((qid) => {
+        const question = quizData.find(q => q.id === qid);
+        const userIdx = state.userAnswers[qid];
+        const permutation = state.answerOrder[qid];
+
+        let userText = 'Nu a răspuns';
+        let isCorrect = false;
+        if (userIdx !== undefined) {
+            const origIndex = permutation[userIdx];
+            const chosen = question.answers[origIndex];
+            userText = chosen.text;
+            isCorrect = chosen.correct;
+        }
 
         if (isCorrect) {
             correctAnswers++;
         } else {
-            // Collect wrong answers
-            const correctIndex = question.answers.findIndex(a => a.correct);
+            const correctOrigIndex = question.answers.findIndex(a => a.correct);
             wrongAnswers.push({
                 id: question.id,
                 question: question.question,
-                userAnswer: selectedIndex !== -1 ? question.answers[selectedIndex].text : 'Nu a răspuns',
-                correctAnswer: question.answers[correctIndex].text
+                userAnswer: userText,
+                correctAnswer: question.answers[correctOrigIndex].text
             });
         }
     });
 
-    // Calculate score: 1 point from office + (correct answers × 0.5)
     const score = 1 + (correctAnswers * 0.5);
     const percentage = (correctAnswers / quizData.length) * 100;
+
+    state.completed = true;
+    state.finalResults = { score, percentage, correctAnswers, wrongAnswers };
+    stopTimer();
+    saveState();
 
     showResults(score, percentage, correctAnswers, wrongAnswers);
 }
@@ -303,81 +514,128 @@ function showResults(score, percentage, correctAnswers, wrongAnswers) {
     document.getElementById('finalScore').textContent = score.toFixed(2);
     document.getElementById('scorePercentage').textContent = `${percentage.toFixed(1)}% corecte (${correctAnswers}/18)`;
 
-    // Message based on score
     let message = '';
-    if (score >= 9) {
-        message = 'Excelent! 🎯';
-    } else if (score >= 8) {
-        message = 'Foarte bine! 👏';
-    } else if (score >= 7) {
-        message = 'Bine! ✓';
-    } else if (score >= 6) {
-        message = 'Satisfăcător';
-    } else {
-        message = 'Încearcă din nou';
+    if (score >= 9) message = 'Excelent!';
+    else if (score >= 8) message = 'Foarte bine!';
+    else if (score >= 7) message = 'Bine!';
+    else if (score >= 6) message = 'Satisfăcător';
+    else message = 'Încearcă din nou';
+
+    if (state.timerEnabled && state.timerStart) {
+        const totalSec = Math.floor((state.timerElapsed || (Date.now() - state.timerStart)) / 1000);
+        const min = Math.floor(totalSec / 60);
+        const sec = totalSec % 60;
+        message += ` (timp: ${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')})`;
     }
 
     document.getElementById('scoreMessage').textContent = message;
 
-    // Show wrong answers if any
     if (wrongAnswers.length > 0) {
         displayWrongAnswers(wrongAnswers);
     }
 }
 
 function displayWrongAnswers(wrongAnswers) {
-    let wrongAnswersHTML = '<div style="margin-top: 2rem; text-align: left;">';
-    wrongAnswersHTML += '<h3 style="font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--text-primary);">Răspunsuri greșite:</h3>';
+    const resultsSection = document.getElementById('resultsSection');
+    const existing = resultsSection.querySelector('#wrong-answers');
+    if (existing) existing.remove();
 
-    wrongAnswers.forEach((item, index) => {
-        wrongAnswersHTML += `
-            <div style="background: var(--bg-alt); padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid var(--accent);">
-                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem;">Întrebarea ${item.id}: ${item.question}</div>
-                <div style="margin: 0.75rem 0; color: var(--text-secondary);">
-                    <span style="font-weight: 500;">Ce ai ales tu:</span>
-                    <span style="color: #d9534f;">${item.userAnswer}</span>
-                </div>
-                <div style="margin: 0.75rem 0; color: var(--text-secondary);">
-                    <span style="font-weight: 500;">Răspunsul corect:</span>
-                    <span style="color: #5cb85c;">${item.correctAnswer}</span>
-                </div>
-            </div>
-        `;
+    const wrap = document.createElement('div');
+    wrap.id = 'wrong-answers';
+    wrap.style.cssText = 'margin-top: 2rem; text-align: left;';
+
+    const heading = document.createElement('h3');
+    heading.style.cssText = 'font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--text-primary);';
+    heading.textContent = 'Răspunsuri greșite:';
+    wrap.appendChild(heading);
+
+    wrongAnswers.forEach((item) => {
+        const card = document.createElement('div');
+        card.style.cssText = 'background: var(--bg-alt); padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid var(--accent);';
+
+        const q = document.createElement('div');
+        q.style.cssText = 'font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem;';
+        q.textContent = `Întrebarea ${item.id}: ${item.question}`;
+        card.appendChild(q);
+
+        const userRow = document.createElement('div');
+        userRow.style.cssText = 'margin: 0.75rem 0; color: var(--text-secondary);';
+        const userLbl = document.createElement('span');
+        userLbl.style.fontWeight = '500';
+        userLbl.textContent = 'Ce ai ales tu: ';
+        const userVal = document.createElement('span');
+        userVal.style.color = '#d9534f';
+        userVal.textContent = item.userAnswer;
+        userRow.appendChild(userLbl);
+        userRow.appendChild(userVal);
+        card.appendChild(userRow);
+
+        const correctRow = document.createElement('div');
+        correctRow.style.cssText = 'margin: 0.75rem 0; color: var(--text-secondary);';
+        const correctLbl = document.createElement('span');
+        correctLbl.style.fontWeight = '500';
+        correctLbl.textContent = 'Răspunsul corect: ';
+        const correctVal = document.createElement('span');
+        correctVal.style.color = '#5cb85c';
+        correctVal.textContent = item.correctAnswer;
+        correctRow.appendChild(correctLbl);
+        correctRow.appendChild(correctVal);
+        card.appendChild(correctRow);
+
+        wrap.appendChild(card);
     });
 
-    wrongAnswersHTML += '</div>';
-
-    // Insert the wrong answers after the score section
-    const resultsSection = document.getElementById('resultsSection');
-    const existingWrongAnswers = resultsSection.querySelector('[id="wrong-answers"]');
-    if (existingWrongAnswers) {
-        existingWrongAnswers.remove();
-    }
-
-    const wrongAnswersDiv = document.createElement('div');
-    wrongAnswersDiv.id = 'wrong-answers';
-    wrongAnswersDiv.innerHTML = wrongAnswersHTML;
-    resultsSection.insertBefore(wrongAnswersDiv, resultsSection.querySelector('#retakeBtn'));
+    resultsSection.insertBefore(wrap, resultsSection.querySelector('#retakeBtn'));
 }
 
-function resetQuiz() {
+// === RESET ACTIONS ===
+
+function resetAnswers() {
+    // Clear the current selection but keep the same shuffled order
+    state.userAnswers = {};
     document.getElementById('quizForm').reset();
     document.querySelectorAll('.question-card').forEach(card => {
         card.classList.remove('answered');
     });
-    document.getElementById('progressFill').style.width = '0%';
+    updateProgress();
+    saveState();
 }
 
 function retakeQuiz() {
-    document.getElementById('resultsSection').classList.remove('show');
+    // New attempt with the same shuffle/timer settings
+    state = createNewState({ shuffle: state.shuffleEnabled, timer: state.timerEnabled });
+    showResultsHidden();
+    initializeQuiz();
+    if (state.timerEnabled) startTimer();
+    saveState();
+}
+
+function clearAllProgress() {
+    stopTimer();
+    clearState();
+    state = createNewState({ shuffle: state.shuffleEnabled, timer: state.timerEnabled });
+    syncControlsToState();
+    showResultsHidden();
+    initializeQuiz();
+    if (state.timerEnabled) startTimer();
+}
+
+function showResultsHidden() {
+    const resultsSection = document.getElementById('resultsSection');
+    resultsSection.classList.remove('show');
     document.getElementById('quizForm').classList.remove('hidden');
     document.getElementById('quizActions').style.display = 'flex';
+    const wrong = document.getElementById('wrong-answers');
+    if (wrong) wrong.remove();
+}
 
-    // Remove wrong answers display
-    const wrongAnswersDiv = document.getElementById('wrong-answers');
-    if (wrongAnswersDiv) {
-        wrongAnswersDiv.remove();
+// === UTIL ===
+
+function shuffleArray(arr) {
+    const copy = arr.slice();
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
     }
-
-    resetQuiz();
+    return copy;
 }
